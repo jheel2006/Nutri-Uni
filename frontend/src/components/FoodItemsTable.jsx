@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import foodPlaceholder from '../assets/food_placeholder.png';
 import {
   Table,
   TableBody,
@@ -97,9 +98,9 @@ function FoodItemsTable({ loading, refresh }) {
                   <TableCell className="p-3">
                     <Avatar className="h-12 w-12 rounded-full border">
                       <img
-                        src={item.item_photo_link || "/placeholder-food.png"}
+                        src={item.item_photo_link || foodPlaceholder}
                         alt={item.item_name}
-                        className="object-cover"
+                        className="object-cover w-full h-full rounded-full"
                       />
                     </Avatar>
                   </TableCell>

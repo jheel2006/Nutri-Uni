@@ -138,20 +138,25 @@ function AdminDashboard() {
           <h1 className="text-2xl font-header-primary text-[#303030]">Menu</h1>
 
           <div className="flex gap-4">
-            <button
-              onClick={() => navigate("/admin/add-item")}
-              className="bg-[#95ae45] hover:bg-[#86a036] text-white px-4 py-2 rounded-xl shadow"
-            >
-              + Add Item
-            </button>
+            {activeTab === "items" && (
+              <button
+                onClick={() => navigate("/admin/add-item")}
+                className="bg-[#95ae45] hover:bg-[#86a036] text-white px-4 py-2 rounded-xl shadow"
+              >
+                + Add Item
+              </button>
+            )}
 
-            <button
-              onClick={() => navigate("/admin/add-to-menu")}
-              className="bg-[#008b9e] hover:bg-[#007a8a] text-white px-4 py-2 rounded-xl shadow"
-            >
-              + Add to Menu
-            </button>
+            {activeTab === "menu" && (
+              <button
+                onClick={() => navigate("/admin/add-to-menu")}
+                className="bg-[#008b9e] hover:bg-[#007a8a] text-white px-4 py-2 rounded-xl shadow"
+              >
+                + Add to Menu
+              </button>
+            )}
           </div>
+
         </div>
         {activeTab === "menu" && (
           <MenuTable menuItems={menu} loading={loading} refresh={fetchMenu} />

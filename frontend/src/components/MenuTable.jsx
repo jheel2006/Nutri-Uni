@@ -72,7 +72,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
                           <img
                             src={item.food_info.item_photo_link}
                             alt={item.food_info.item_name}
-                            className="object-cover"
+                            className="object-cover w-full h-full rounded-full"
                           />
                         ) : (
                           <div className="bg-white w-full h-full rounded-full" />
