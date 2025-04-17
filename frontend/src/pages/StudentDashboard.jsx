@@ -1,116 +1,227 @@
 import { useEffect, useState } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { getWeekMenu } from "../api/meals";
-import MenuTable from "@/components/MenuTable";
-import Header from "@/components/Header"; 
+import Header from "@/components/Header";
+import MenuCard from "@/components/MenuCard";
+import DiningHallSelection from "@/components/DiningHallSelection";
+import { NutritionInfo } from "@/components/NutritionInfo";
+
+const DAILY_VALUES = {
+  energy: 2000,
+  fats: 70,
+  protein: 50,
+  sugar: 30,
+  salt: 6
+};
 
 function StudentDashboard() {
+  const { user } = useUser();
   const [menu, setMenu] = useState([]);
   const [filteredMenu, setFilteredMenu] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [selectedCounter, setSelectedCounter] = useState(null);
+  const [selectedDiningHall, setSelectedDiningHall] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState("");
+
+  const calculateKJ = (kcal) => kcal ? Math.round(kcal * 4.184) : null;
+  const calculatePercentage = (value, nutrient) => {
+    if (!value || !DAILY_VALUES[nutrient]) return null;
+    return Math.round((value / DAILY_VALUES[nutrient]) * 100);
+  };
+
+  const enhanceMenuData = (menuData) => {
+    return menuData.map(item => ({
+      ...item,
+      food_info: item.food_info ? {
+        ...item.food_info,
+        energy_kj: calculateKJ(item.food_info.energy),
+        energy_percent: calculatePercentage(item.food_info.energy, 'energy'),
+        fats_percent: calculatePercentage(item.food_info.fats, 'fats'),
+        protein_percent: calculatePercentage(item.food_info.protein, 'protein'),
+        sugar_percent: calculatePercentage(item.food_info.sugar, 'sugar'),
+        salt_percent: calculatePercentage(item.food_info.salt, 'salt')
+      } : null
+    }));
+  };
 
   useEffect(() => {
     const fetchMenu = async () => {
       setLoading(true);
       try {
         const res = await getWeekMenu();
-        setMenu(res.data);
-        setFilteredMenu(res.data);
-        setError("");
+        setMenu(enhanceMenuData(res.data));
+        setFilteredMenu(enhanceMenuData(res.data));
       } catch (err) {
-        console.error(err);
-        setError("Unable to load meals at counter. Please try again later.");
+        setError("Unable to load meals. Please try again later.");
       }
       setLoading(false);
     };
-
     fetchMenu();
   }, []);
 
   const handleSearch = (q) => {
     setQuery(q);
-    applyFilters(q, selectedCounter);
+    applyFilters(q, selectedCounter, selectedDiningHall);
   };
 
-  const handleCounterFilter = (counter) => {
-    const newCounter = counter === selectedCounter ? null : counter;
-    setSelectedCounter(newCounter);
-    applyFilters(query, newCounter);
-  };
-
-  const applyFilters = (q, counter) => {
+  const applyFilters = (q, counter, diningHall) => {
     let filtered = [...menu];
+    
+    if (diningHall) {
+      filtered = filtered.filter(item => 
+        item.dining_hall?.toLowerCase() === diningHall.toLowerCase()
+      );
+    }
 
     if (counter) {
-      filtered = filtered.filter((item) => item.counter?.toLowerCase() === counter.toLowerCase());
+      filtered = filtered.filter(item => 
+        item.counter?.toLowerCase() === counter.toLowerCase()
+      );
     }
 
     if (q.trim()) {
       const keyword = q.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.item_name?.toLowerCase().includes(keyword) ||
-          (item.allergens && item.allergens.join(" ").toLowerCase().includes(keyword)) ||
-          (item.vegan && keyword === "vegan") ||
-          (item.veg && keyword === "vegetarian") ||
-          (item.gluten_free && keyword === "gluten free")
-      );
+      filtered = filtered.filter(item => {
+        if (!item.food_info) return false;
+        
+        if (item.food_info.item_name?.toLowerCase().includes(keyword)) {
+          return true;
+        }
+        
+        if (item.food_info.allergens?.some(allergen => 
+          allergen.toLowerCase().includes(keyword)
+        )) {
+          return true;
+        }
+        
+        const dietaryKeywords = [];
+        if (item.food_info.veg) dietaryKeywords.push('vegetarian');
+        if (item.food_info.vegan) dietaryKeywords.push('vegan');
+        if (item.food_info.gluten_free) dietaryKeywords.push('gluten free');
+        
+        return dietaryKeywords.some(tag => 
+          tag.includes(keyword)
+        );
+      });
     }
 
     setFilteredMenu(filtered);
   };
 
-  const uniqueCounters = [...new Set(menu.map((item) => item.counter))];
+  const handleDiningHallSelect = (hall) => {
+    setSelectedDiningHall(hall);
+    setSelectedCounter(null);
+    applyFilters(query, null, hall);
+  };
+
+  const handleCounterFilter = (counter) => {
+    const newCounter = counter === selectedCounter ? null : counter;
+    setSelectedCounter(newCounter);
+    applyFilters(query, newCounter, selectedDiningHall);
+  };
+
+  const handleCardClick = (item) => {
+    setSelectedItem(item);
+  };
+
+  const handleCloseNutrition = () => {
+    setSelectedItem(null);
+  };
+
+  const getAvailableCounters = () => {
+    if (!selectedDiningHall) return [];
+    const hallMeals = menu.filter(item => 
+      item.dining_hall?.toLowerCase() === selectedDiningHall.toLowerCase()
+    );
+    return [...new Set(hallMeals.map(item => item.counter))].filter(Boolean);
+  };
+
+  const uniqueDiningHalls = [...new Set(menu.map(item => item.dining_hall))];
 
   return (
     <>
-      <Header showItemsTab={false} /> 
+      <Header 
+        showItemsTab={false} 
+        onSearch={handleSearch}
+      />
 
       <div className="pt-20 px-4 md:px-6 lg:px-8">
         <div className="w-full max-w-[1600px] mx-auto space-y-6">
-          <h1 className="text-2xl font-header-primary text-[#303030]">Student Dashboard</h1>
+          <h1 className="text-2xl font-header-primary text-[#303030]">
+            Hello {user?.firstName || 'there'},
+          </h1>
 
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <input
-              type="text"
-              placeholder="Search meals by name, ingredient, or dietary category"
-              value={query}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full max-w-md px-4 py-2 border rounded-xl shadow"
+          {!selectedDiningHall ? (
+            <DiningHallSelection
+              diningHalls={uniqueDiningHalls}
+              onSelect={handleDiningHallSelect}
             />
-          </div>
+          ) : (
+            <>
+              <div className="flex flex-col space-y-4">
+                <div className="flex flex-wrap gap-3">
+                  {getAvailableCounters().map(counter => (
+                    <button
+                      key={counter}
+                      onClick={() => handleCounterFilter(counter)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium ${
+                        selectedCounter === counter
+                          ? "bg-[#008b9e] text-white"
+                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                      }`}
+                    >
+                      {counter}
+                    </button>
+                  ))}
+                </div>
 
-          <div className="flex flex-wrap gap-3 mt-4">
-            {uniqueCounters.map((counter) => (
-              <button
-                key={counter}
-                onClick={() => handleCounterFilter(counter)}
-                className={`px-4 py-2 rounded-xl shadow ${
-                  selectedCounter === counter ? "bg-[#008b9e] text-white" : "bg-gray-200"
-                }`}
-              >
-                {counter}
-              </button>
-            ))}
-          </div>
+                <button
+                  onClick={() => setSelectedDiningHall(null)}
+                  className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 self-start"
+                >
+                  Change Dining Hall
+                </button>
+              </div>
 
-          {error && (
-            <div className="text-red-600 mt-4 text-lg font-medium">{error}</div>
+              {error && (
+                <div className="text-red-600 mt-4 text-lg font-medium">{error}</div>
+              )}
+
+              {!loading && filteredMenu.length === 0 && (
+                <div className="text-center text-lg text-gray-500 mt-4">
+                  {query.trim() 
+                    ? "No meals found matching your search."
+                    : selectedCounter
+                      ? "No meals available at this counter today."
+                      : "No meals found."}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredMenu.map(item => (
+                  <MenuCard 
+                    key={item.id} 
+                    item={item} 
+                    onClick={handleCardClick}
+                  />
+                ))}
+              </div>
+            </>
           )}
-
-          {!loading && filteredMenu.length === 0 && !error && (
-            <div className="text-center text-lg text-gray-500 mt-4">
-              {selectedCounter
-                ? "No meals available at this counter today."
-                : "No meals found. Try a different keyword."}
-            </div>
-          )}
-
-          <MenuTable menuItems={filteredMenu} loading={loading} hideAdminControls /> 
         </div>
       </div>
+
+      {selectedItem && (
+        <div className="fixed inset-0 z-40" onClick={handleCloseNutrition}>
+          <NutritionInfo
+            item={selectedItem}
+            open={!!selectedItem}
+            onClose={handleCloseNutrition}
+          />
+        </div>
+      )}
     </>
   );
 }

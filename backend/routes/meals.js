@@ -1,9 +1,7 @@
-// Importing necessary libraries
 import express from "express";
-// import { createClient } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient.js";
-import multer from "multer"; // Used to handle file uploads (like images)
-import crypto from "crypto"; // Used to generate random file names for images
+import multer from "multer"; 
+import crypto from "crypto"; 
 import { calculateHealthScore } from "../healthScore.js";
 
 const router = express.Router();
