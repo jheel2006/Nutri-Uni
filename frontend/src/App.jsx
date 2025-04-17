@@ -73,7 +73,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import StudentInitializer from "./components/StudentInitializer";
 import AddFoodItemForm from "./components/AddFoodItemForm";
 import AddMenuItemForm from "./components/AddMenuItemForm";
-
+import RoleRedirector from "./components/RoleRedirector";
 function App() {
   return (
     <Router>
@@ -81,12 +81,13 @@ function App() {
         <SignedOut>
           <SignInButton />
         </SignedOut>
-        {/* <SignedIn>
+        <SignedIn>
           <UserButton />
-        </SignedIn> */}
+        </SignedIn>
       </header>
 
       <SignedIn>
+        <RoleRedirector />
         <StudentInitializer />
       </SignedIn>
 
