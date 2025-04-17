@@ -1,10 +1,52 @@
 /*  */
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+:root {
+  --app-accent: rgba(255, 159, 28, 1);
+  --app-background: rgba(255, 249, 240, 1);
+  --buttonsprimary: rgba(0, 139, 158, 1);
+  --buttonssecondary: rgba(149, 174, 69, 1);
+  --header-primary-font-family: "Source Sans Pro", Helvetica;
+  --row-primary-text-font-family: "Source Sans Pro", Helvetica;
+  --text: rgba(62, 54, 44, 1);
+  --shadow-1: 0px 1px 3px 0px rgba(166, 175, 195, 0.4);
+}
+
 body {
+  font-family: 'Poppins', sans-serif;
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* display: flex;
+  place-items: center; */
   min-width: 320px;
   min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Ubuntu', sans-serif;
+}
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+input[type="checkbox"] {
+  accent-color: #95ae45;
 }

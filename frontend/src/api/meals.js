@@ -13,3 +13,8 @@ export const addFoodItem = (formData) =>
   });
 export const getFoodItems = () => API.get("/food-info");
 export const addMenuItem = (data) => API.post("/week-menu", data);
+export const deleteMenuItem = (id) => API.delete(`/week-menu/${id}`);
+export const updateMenuItem = (id, data) => API.put(`/week-menu/${id}`, data);
+
+export const deleteFoodItem = (id) => API.delete(`/food-info/${id}`);
+export const updateFoodItem = (id, data) => API.put(`/food-info/${id}`, data);

@@ -50,11 +50,34 @@ router.get("/week-menu", async (req, res) => {
  * GET /food-info
  * This endpoint returns a simple list of food items (id and name) for dropdown menus
  */
+// router.get("/food-info", async (req, res) => {
+//   const { data, error } = await supabase
+//     .from("food_info") // Query the "food_info" table
+//     .select("id, item_name") // Only fetch ID and name
+//     .order("item_name", { ascending: true }); //Sprt alphabetically
+
+//   if (error) return res.status(500).json({ error: error.message });
+//   res.status(200).json(data);
+// });
+
 router.get("/food-info", async (req, res) => {
   const { data, error } = await supabase
-    .from("food_info") // Query the "food_info" table
-    .select("id, item_name") // Only fetch ID and name
-    .order("item_name", { ascending: true }); //Sprt alphabetically
+    .from("food_info")
+    .select(`
+      id,
+      item_name,
+      item_photo_link,
+      veg,
+      vegan,
+      gluten_free,
+      allergens,
+      energy,
+      fats,
+      protein,
+      salt,
+      sugar
+    `)
+    .order("item_name", { ascending: true });
 
   if (error) return res.status(500).json({ error: error.message });
   res.status(200).json(data);
