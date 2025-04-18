@@ -4,7 +4,7 @@ import foodPlaceholder from '../assets/food_placeholder.png';
 const MenuCard = ({ item, onClick }) => {
   return (
     <div 
-      className="rounded-xl p-4 shadow-sm bg-[#ebf6f7] hover:bg-[#008b9e] hover:text-white transition-colors cursor-pointer h-full"
+      className="rounded-xl p-4 shadow-sm bg-[#ebf6f7] hover:bg-[#bde6ea] transition-colors cursor-pointer h-full"
       onClick={() => onClick(item)}
     >
       <div className="flex flex-row items-start h-full space-x-4">
@@ -48,7 +48,7 @@ const MenuCard = ({ item, onClick }) => {
 
           {item.food_info?.allergens?.length > 0 && (
             <div className="mt-auto pt-3 border-t border-gray-200">
-              <p className="text-sm text-gray-600 hover:text-gray-200">
+              <p className="text-sm text-gray-600 hover:text-gray-800">
                 <span className="font-semibold">Allergens: </span> 
                 {item.food_info.allergens.join(", ")}
               </p>

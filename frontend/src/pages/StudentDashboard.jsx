@@ -166,10 +166,10 @@ function StudentDashboard() {
                     <button
                       key={counter}
                       onClick={() => handleCounterFilter(counter)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium ${
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                         selectedCounter === counter
                           ? "bg-[#008b9e] text-white"
-                          : "bg-[#ebf6f7] text-gray-800 hover:bg-[#008b9e] hover:text-white"
+                          : "bg-[#ebf6f7] text-gray-800 hover:bg-[#bde6ea]"
                       }`}
                     >
                       {counter}
@@ -179,7 +179,7 @@ function StudentDashboard() {
 
                 <button
                   onClick={() => setSelectedDiningHall(null)}
-                  className="px-4 py-2 bg-[#ebf6f7] rounded-xl hover:bg-[#008b9e] hover:text-white self-start transition-colors"
+                  className="px-4 py-2 bg-[#ebf6f7] rounded-xl hover:bg-[#bde6ea] self-start transition-colors"
                 >
                   Change Dining Hall
                 </button>
