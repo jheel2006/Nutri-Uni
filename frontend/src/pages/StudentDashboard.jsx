@@ -169,7 +169,7 @@ function StudentDashboard() {
                       className={`px-4 py-2 rounded-full text-sm font-medium ${
                         selectedCounter === counter
                           ? "bg-[#008b9e] text-white"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                          : "bg-[#ebf6f7] text-gray-800 hover:bg-[#008b9e] hover:text-white"
                       }`}
                     >
                       {counter}
@@ -179,7 +179,7 @@ function StudentDashboard() {
 
                 <button
                   onClick={() => setSelectedDiningHall(null)}
-                  className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 self-start"
+                  className="px-4 py-2 bg-[#ebf6f7] rounded-xl hover:bg-[#008b9e] hover:text-white self-start transition-colors"
                 >
                   Change Dining Hall
                 </button>
@@ -192,7 +192,7 @@ function StudentDashboard() {
               {!loading && filteredMenu.length === 0 && (
                 <div className="text-center text-lg text-gray-500 mt-4">
                   {query.trim() 
-                    ? "No meals found matching your search."
+                    ? "No meals found. Try a different keyword."
                     : selectedCounter
                       ? "No meals available at this counter today."
                       : "No meals found."}
