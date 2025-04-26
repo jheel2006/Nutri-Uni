@@ -10,7 +10,7 @@ import {
   addFoodItem,
   getFoodItems,
   addMenuItem,
-  deleteMenuItem,updateMenuItem
+  deleteMenuItem, updateMenuItem
 } from "../api/meals";
 
 import AddFoodItemForm from "@/components/AddFoodItemForm";
@@ -26,7 +26,7 @@ function AdminDashboard() {
   const [menu, setMenu] = useState([]);
   const [foodItems, setFoodItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("menu"); 
+  const [activeTab, setActiveTab] = useState("menu");
   const [newFood, setNewFood] = useState({
     item_name: "",
     item_photo_link: "",
@@ -109,6 +109,7 @@ function AdminDashboard() {
       await addMenuItem({
         food_info_id: selectedFoodId,
         ...menuMeta,
+        // CHANGE: take input
         date_available: new Date().toISOString().split("T")[0],
       });
       alert("Menu item added!");
@@ -130,9 +131,9 @@ function AdminDashboard() {
   }, []);
 
   return (
-    <div className="pt-20 px-4 md:px-6 lg:px-8"> 
+    <div className="pt-20 px-4 md:px-6 lg:px-8">
       <div className="w-full  max-w-[1600px] mx-auto space-y-8">
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Header activeTab={activeTab} setActiveTab={setActiveTab} />
 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-header-primary text-[#303030]">Menu</h1>
@@ -164,7 +165,7 @@ function AdminDashboard() {
         {activeTab === "items" && (
           <FoodItemsTable loading={loading} refresh={loadFoodItems} />
         )}
-        
+
         {/* <MenuTable menuItems={menu} loading={loading} refresh={fetchMenu}/> */}
         {/* <FoodItemsTable menuItems={menu} loading={loading} refresh={fetchMenu}/> */}
       </div>

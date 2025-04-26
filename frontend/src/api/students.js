@@ -6,3 +6,11 @@ const API = axios.create({
 
 export const initStudent = (clerk_user_id, email) =>
   API.post("/init-student", { clerk_user_id, email });
+
+export const updatePreferences = (clerk_user_id, prefs) =>
+  API.patch("/preferences", { clerk_user_id, ...prefs });
+
+export const getRecommendations = (clerk_user_id) =>
+  API.get(`/recommendations`, {
+    params: { clerk_user_id },
+  });

@@ -12,27 +12,29 @@
  * @returns {number} Health score (1 to 5)
  */
 export function calculateHealthScore({ energy, fats, sugar, salt, protein }) {
-    // Weighting factors (tweakable)
     const energyWeight = 0.0025;
     const fatWeight = 0.2;
-    const sugarWeight = 0.15;
+    const sugarWeight = 0.3; // increased penalty
     const saltWeight = 1.5;
-    const proteinWeight = 0.1;
+    const proteinWeight = 0.2;
 
-    // Raw score: higher means worse
+    // Adjust sugar penalty for very high sugar items
+    const sugarPenalty = sugar > 10 ? sugar * sugarWeight * 1.5 : sugar * sugarWeight;
+
     let rawScore =
         energy * energyWeight +
         fats * fatWeight +
-        sugar * sugarWeight +
+        sugarPenalty +
         salt * saltWeight -
         protein * proteinWeight;
 
-    // Convert to a 1–5 score (higher is healthier)
-    let healthScore = Math.round(5 - rawScore);
+    // Penalize nutrient-empty items
+    if (protein === 0) rawScore += 0.3;
 
-    // Clamp the value between 1 and 5
+    let healthScore = Math.round(5 - rawScore);
     if (healthScore > 5) healthScore = 5;
     if (healthScore < 1) healthScore = 1;
 
     return healthScore;
 }
+

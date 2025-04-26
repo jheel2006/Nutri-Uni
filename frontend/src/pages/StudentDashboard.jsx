@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { getWeekMenu } from "../api/meals";
+import { getRecommendations } from "../api/students";
 import Header from "@/components/Header";
 import MenuCard from "@/components/MenuCard";
 import DiningHallSelection from "@/components/DiningHallSelection";
@@ -56,7 +57,7 @@ function StudentDashboard() {
     const fetchMenu = async () => {
       setLoading(true);
       try {
-        const res = await getWeekMenu();
+        const res = await getRecommendations(user.id);
         setMenu(enhanceMenuData(res.data));
         setFilteredMenu(enhanceMenuData(res.data));
       } catch (err) {
@@ -74,15 +75,15 @@ function StudentDashboard() {
 
   const applyFilters = (q, counter, diningHall) => {
     let filtered = [...menu];
-    
+
     if (diningHall) {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.dining_hall?.toLowerCase() === diningHall.toLowerCase()
       );
     }
 
     if (counter) {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.counter?.toLowerCase() === counter.toLowerCase()
       );
     }
@@ -91,23 +92,23 @@ function StudentDashboard() {
       const keyword = q.toLowerCase();
       filtered = filtered.filter(item => {
         if (!item.food_info) return false;
-        
+
         if (item.food_info.item_name?.toLowerCase().includes(keyword)) {
           return true;
         }
-        
-        if (item.food_info.allergens?.some(allergen => 
+
+        if (item.food_info.allergens?.some(allergen =>
           allergen.toLowerCase().includes(keyword)
         )) {
           return true;
         }
-        
+
         const dietaryKeywords = [];
         if (item.food_info.veg) dietaryKeywords.push('vegetarian');
         if (item.food_info.vegan) dietaryKeywords.push('vegan');
         if (item.food_info.gluten_free) dietaryKeywords.push('gluten free');
-        
-        return dietaryKeywords.some(tag => 
+
+        return dietaryKeywords.some(tag =>
           tag.includes(keyword)
         );
       });
@@ -142,7 +143,7 @@ function StudentDashboard() {
   };
 
   const counterHasMeals = (counter) => {
-    return menu.some(item => 
+    return menu.some(item =>
       item.dining_hall === selectedDiningHall &&
       item.counter === counter &&
       item.food_info
@@ -153,8 +154,8 @@ function StudentDashboard() {
 
   return (
     <>
-      <Header 
-        showItemsTab={false} 
+      <Header
+        showItemsTab={false}
         onSearch={handleSearch}
       />
 
@@ -177,11 +178,10 @@ function StudentDashboard() {
                     <button
                       key={counter}
                       onClick={() => handleCounterFilter(counter)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        selectedCounter === counter
-                          ? "bg-[#008b9e] text-white"
-                          : "bg-[#ebf6f7] text-gray-800 hover:bg-[#bde6ea]"
-                      }`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCounter === counter
+                        ? "bg-[#008b9e] text-white"
+                        : "bg-[#ebf6f7] text-gray-800 hover:bg-[#bde6ea]"
+                        }`}
                     >
                       {counter}
                     </button>
@@ -210,7 +210,7 @@ function StudentDashboard() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm text-yellow-700">
-                        {query.trim() 
+                        {query.trim()
                           ? "No meals found. Try a different keyword."
                           : selectedCounter
                             ? "No meals available at this counter today."
@@ -223,9 +223,9 @@ function StudentDashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredMenu.map(item => (
-                  <MenuCard 
-                    key={item.id} 
-                    item={item} 
+                  <MenuCard
+                    key={item.id}
+                    item={item}
                     onClick={handleCardClick}
                   />
                 ))}
