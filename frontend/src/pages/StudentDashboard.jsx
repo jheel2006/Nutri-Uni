@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { getWeekMenu } from "../api/meals";
 import { getRecommendations } from "../api/students";
+import { getStudentInfo } from "../api/students";
 import Header from "@/components/Header";
 import MenuCard from "@/components/MenuCard";
 import DiningHallSelection from "@/components/DiningHallSelection";
@@ -55,18 +56,47 @@ function StudentDashboard() {
 
   useEffect(() => {
     const fetchMenu = async () => {
+      if (!user || !user.id) return;
+
       setLoading(true);
       try {
-        const res = await getRecommendations(user.id);
-        setMenu(enhanceMenuData(res.data));
-        setFilteredMenu(enhanceMenuData(res.data));
+        // Fetch both menu and student preferences at the same time
+        const [menuRes, studentRes] = await Promise.all([
+          getRecommendations(user.id),
+          getStudentInfo(user.id)
+        ]);
+
+        const enhancedMenu = enhanceMenuData(menuRes.data);
+        const student = studentRes.data; // { is_veg, is_vegan, is_gluten_free, allergens }
+
+        // Now filter meals based on student's preferences
+        const filteredByPreferences = enhancedMenu.filter(item => {
+          if (!item.food_info) return false;
+
+          // Check vegetarian
+          if (student.is_veg && !item.food_info.veg) return false;
+
+          // Check vegan
+          if (student.is_vegan && !item.food_info.vegan) return false;
+
+          // Check gluten-free
+          if (student.is_gluten_free && !item.food_info.gluten_free) return false;
+
+          return true; // If it passes all active filters
+        });
+
+        setMenu(filteredByPreferences);
+        setFilteredMenu(filteredByPreferences);
       } catch (err) {
+        console.error(err);
         setError("Unable to load meals. Please try again later.");
       }
       setLoading(false);
     };
+
     fetchMenu();
-  }, []);
+  }, [user]);
+
 
   const handleSearch = (q) => {
     setQuery(q);

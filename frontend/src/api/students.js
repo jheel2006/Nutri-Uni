@@ -14,3 +14,8 @@ export const getRecommendations = (clerk_user_id) =>
   API.get(`/recommendations`, {
     params: { clerk_user_id },
   });
+
+export const getStudentInfo = (clerk_user_id) =>
+  API.get(`/info`, {
+    params: { clerk_user_id },
+  });
