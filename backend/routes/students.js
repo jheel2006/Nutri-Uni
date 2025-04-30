@@ -84,10 +84,10 @@ router.get("/recommendations", async (req, res) => {
     return res.status(400).json({ error: "Missing clerk_user_id" });
   }
 
+
   // 1. Get today's meals
   // const today = new Date().toISOString().split("T")[0];
-  // 1. Get all the information from the the db like full food_info
-  // 2. Change the way we are adding the date in the frontend and backend
+  // 1. CHANGE: Get all the information from the the db like full food_info
   const { data: todayMeals, error: menuError } = await supabase
     .from("week_menu")
     .select(
@@ -100,7 +100,16 @@ router.get("/recommendations", async (req, res) => {
           id,
           item_name,
           item_photo_link,
-          health_score
+          health_score,
+          veg,
+          vegan,
+          gluten_free,
+          allergens,
+          energy,
+          fats,
+          protein,
+          salt,
+          sugar
         )
       `
     )
@@ -154,3 +163,28 @@ router.get("/recommendations", async (req, res) => {
 });
 
 export default router;
+
+/**
+ * GET /students/info
+ * Get a student's dietary preferences and allergens
+ * Required: clerk_user_id (sent via query)
+ */
+router.get("/info", async (req, res) => {
+  const { clerk_user_id } = req.query;
+
+  if (!clerk_user_id) {
+    return res.status(400).json({ error: "Missing clerk_user_id" });
+  }
+
+  const { data, error } = await supabase
+    .from("students")
+    .select("is_veg, is_vegan, is_gluten_free, allergens")
+    .eq("id", clerk_user_id)
+    .single();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.status(200).json(data);
+});
