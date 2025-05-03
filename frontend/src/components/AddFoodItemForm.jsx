@@ -96,10 +96,10 @@ export default function AddItemFormPage() {
   
     <div className="min-h-screen p-8">
       <Header />
-      <div className="pt-12 px-6">
+      <div className="pt-12 px-6 mt-15">
         <div className="max-w-[1600px] mx-auto">
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/admin/dashboard", { state: { tab: "items" } })}
         className="text-black font-semibold mb-6 flex items-center gap-2"
       >
         <ChevronLeft size={20} /> Add new item

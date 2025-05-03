@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, UserCircle } from "lucide-react";
 
-const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch }) => {
+const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProfileClick }) => {
   const [searchValue, setSearchValue] = useState("");
-
+  const navigate = useNavigate();
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
@@ -60,7 +61,11 @@ const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch }) => {
         </nav>
 
         {/* User Icon */}
-        <UserCircle className="h-6 w-6 text-[#F9A826]" />
+        {/* <UserCircle className="h-6 w-6 text-[#F9A826]" /> */}
+        <UserCircle
+          className="h-6 w-6 text-[#F9A826] cursor-pointer"
+          onClick={onProfileClick}
+        />
       </div>
     </header>
   );

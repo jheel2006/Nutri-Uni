@@ -72,9 +72,9 @@ function AddMenuItemForm() {
   return (
     <div className="pt-32 px-8 sm:px-16 md:px-24 lg:px-32 xl:px-48 pb-12">
       <Header />
-      <div className="mt-8 space-y-8">
+      <div className="mt-8 space-y-8 mt-15">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/admin/dashboard", { state: { tab: "menu" } })}
           className="flex items-center gap-2 text-[--text] font-semibold"
         >
           <ChevronLeft size={20} />
