@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/table";
 import { Pencil, Trash2 } from "lucide-react";
 import { getFoodItems, deleteFoodItem, updateFoodItem } from "../api/meals";
+import { MultiSelect } from "@/components/ui/multiselect";
+
 
 function FoodItemsTable({ loading, refresh }) {
   const [foodItems, setFoodItems] = useState([]);
@@ -54,7 +56,7 @@ function FoodItemsTable({ loading, refresh }) {
     setEditRowId(item.id);
     setEditData({
       ...item,
-      allergens: item.allergens?.join(", ") || "",
+      allergens: item.allergens || [],
     });
   };
 
@@ -62,10 +64,9 @@ function FoodItemsTable({ loading, refresh }) {
     try {
       const updated = {
         ...editData,
-        allergens: editData.allergens
-          ? editData.allergens.split(",").map((a) => a.trim())
-          : [],
+        allergens: editData.allergens,
       };
+
       await updateFoodItem(id, updated);
       setEditRowId(null);
       if (refresh) refresh();
@@ -132,18 +133,24 @@ function FoodItemsTable({ loading, refresh }) {
                   </TableCell>
                   <TableCell className="text-gray-600 text-sm">
                     {editRowId === item.id ? (
-                      <input
-                        value={editData.allergens}
-                        onChange={(e) =>
-                          setEditData({ ...editData, allergens: e.target.value })
+                      <MultiSelect
+                        options={["Eggs", "Milk", "Nuts", "Soy", "Wheat", "Fish"].map((a) => ({
+                          label: a,
+                          value: a,
+                        }))}
+                        selected={editData.allergens}
+                        onChange={(selected) =>
+                          setEditData({ ...editData, allergens: selected })
                         }
-                        className="border p-1 rounded w-full"
+                        className="w-full"
+                        selectedClassName="bg-[#BDE6EA] text-[#303030] font-semibold"
                       />
                     ) : Array.isArray(item.allergens) && item.allergens.length > 0 ? (
                       item.allergens.join(", ")
                     ) : (
                       "None"
                     )}
+
                   </TableCell>
                   <TableCell className="text-gray-600 text-sm leading-5">
                     {editRowId === item.id ? (
@@ -181,7 +188,7 @@ function FoodItemsTable({ loading, refresh }) {
                             onClick={() => handleSave(item.id)}
                             className="text-green-700 border border-green-700 font-semibold px-4 py-1"
                             variant="outline"
-                            >
+                          >
                             Save
                           </Button>
                           <Button
