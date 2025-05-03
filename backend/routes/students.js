@@ -162,7 +162,6 @@ router.patch("/preferences", async (req, res) => {
 //   res.status(200).json([topMeal, ...remainingMeals]);
 // });
 
-// export default router;
 
 router.get("/recommendations", async (req, res) => {
   const { clerk_user_id } = req.query;
