@@ -37,6 +37,7 @@ function StudentDashboard() {
   const [showProfile, setShowProfile] = useState(false);
   const [topRecommendation, setTopRecommendation] = useState(null);
   const [studentPreferences, setStudentPreferences] = useState(null);
+  const [profileJustClosed, setProfileJustClosed] = useState(false);
 
   const toggleProfile = useCallback(() => {
     setShowProfile((prev) => !prev);
@@ -65,38 +66,52 @@ function StudentDashboard() {
     }));
   };
 
+  // Fetch data function to be reused
+  const fetchData = async () => {
+    if (!user || !user.id) return;
+    setLoading(true);
+
+    try {
+      const [menuRes, studentRes, favoritesRes] = await Promise.all([
+        getRecommendations(user.id),
+        getStudentInfo(user.id),
+        getFavorites(user.id),
+      ]);
+
+      const enhancedMenu = enhanceMenuData(menuRes.data);
+      const studentData = studentRes.data;
+      const favoriteIds = favoritesRes.data.map((f) => f.food_id);
+
+      setStudentPreferences(studentData);
+      setFavoriteIds(favoriteIds);
+      setAllMenu(enhancedMenu); // Store the complete menu
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load meals. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Load initial data
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user || !user.id) return;
-      setLoading(true);
-
-      try {
-        const [menuRes, studentRes, favoritesRes] = await Promise.all([
-          getRecommendations(user.id),
-          getStudentInfo(user.id),
-          getFavorites(user.id),
-        ]);
-
-        const enhancedMenu = enhanceMenuData(menuRes.data);
-        const studentData = studentRes.data;
-        const favoriteIds = favoritesRes.data.map((f) => f.food_id);
-
-        setStudentPreferences(studentData);
-        setFavoriteIds(favoriteIds);
-        setAllMenu(enhancedMenu); // Store the complete menu
-
-        // Don't set filtered menu yet - we'll do that separately
-      } catch (err) {
-        console.error(err);
-        setError("Unable to load meals. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [user]);
+
+  // Handle returning from profile view - reload data when profile is closed
+  useEffect(() => {
+    if (profileJustClosed) {
+      // Reset dining hall selection
+      setSelectedDiningHall(null);
+      setSelectedCounter(null);
+
+      // Reload the data with new preferences
+      fetchData();
+
+      // Reset the flag
+      setProfileJustClosed(false);
+    }
+  }, [profileJustClosed]);
 
   // Handle filtering separately based on dining hall, counter, and query
   useEffect(() => {
@@ -191,6 +206,19 @@ function StudentDashboard() {
       });
     }
 
+    // Apply allergen filter
+    if (studentPreferences?.allergens && studentPreferences.allergens.length > 0) {
+      const studentAllergens = studentPreferences.allergens.map((a) => a.toLowerCase());
+
+      filtered = filtered.filter((item) => {
+        const itemAllergens = item.food_info?.allergens || [];
+        const overlaps = itemAllergens.some((a) =>
+          studentAllergens.includes(a.toLowerCase())
+        );
+        return !overlaps; // Exclude meals with matching allergens
+      });
+    }
+
     setFilteredMenu(filtered);
   };
 
@@ -253,6 +281,12 @@ function StudentDashboard() {
 
   const uniqueDiningHalls = Object.keys(hallCounters);
 
+  // Handle returning from profile
+  const handleProfileClose = () => {
+    setShowProfile(false);
+    setProfileJustClosed(true);
+  };
+
   // Render loading state
   if (loading) {
     return (
@@ -274,7 +308,7 @@ function StudentDashboard() {
 
       <div className="pt-20 px-4 md:px-6 lg:px-8 mt-20">
         {showProfile ? (
-          <UserProfile onBack={() => setShowProfile(false)} />
+          <UserProfile onBack={handleProfileClose} />
         ) : (
           <div className="w-full max-w-[1600px] mx-auto space-y-6">
             <h1 className="text-2xl font-header-primary text-[#303030]">
@@ -295,8 +329,8 @@ function StudentDashboard() {
                         key={counter}
                         onClick={() => handleCounterFilter(counter)}
                         className={`flex flex-col items-center justify-center w-20 h-28 rounded-full transition shadow-sm text-sm font-medium ${selectedCounter === counter
-                            ? "bg-[#AEE1E1] text-[#303030]"
-                            : "bg-[#f3fafa] hover:bg-[#e1f0f0] text-[#303030]"
+                          ? "bg-[#AEE1E1] text-[#303030]"
+                          : "bg-[#f3fafa] hover:bg-[#e1f0f0] text-[#303030]"
                           }`}
                       >
                         <div className="text-2xl mb-2">{counterIcons[counter] || "🍽️"}</div>
