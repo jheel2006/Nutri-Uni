@@ -69,7 +69,7 @@ import foodPlaceholder from '../assets/food_placeholder.png';
 import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp }) => {
+const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp, onFavoriteUpdate }) => {
   const { user } = useUser();
   const [isFavorited, setIsFavorited] = useState(isFavoritedProp);
 
@@ -91,6 +91,8 @@ const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp }) => {
         await addFavorite(user.id, item.food_info.id);
         setIsFavorited(true);
       }
+      if (onFavoriteUpdate) onFavoriteUpdate();
+
     } catch (err) {
       console.error("Favorite toggle failed:", err);
     }
@@ -98,9 +100,9 @@ const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp }) => {
 
   return (
     <div
-  className="relative group rounded-xl p-4 shadow-sm bg-[#ebf6f7] hover:bg-[#bde6ea] transition-colors cursor-pointer h-full"
-  onClick={() => onClick(item)}
->
+      className="relative group rounded-xl p-4 shadow-sm bg-[#ebf6f7] hover:bg-[#bde6ea] transition-colors cursor-pointer h-full"
+      onClick={() => onClick(item)}
+    >
       {/* ⭐️ Favorite Button */}
       <button
         onClick={toggleFavorite}

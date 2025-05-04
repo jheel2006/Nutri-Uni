@@ -38,6 +38,8 @@ function StudentDashboard() {
   const [topRecommendation, setTopRecommendation] = useState(null);
   const [studentPreferences, setStudentPreferences] = useState(null);
   const [profileJustClosed, setProfileJustClosed] = useState(false);
+  const [favoritesUpdated, setFavoritesUpdated] = useState(false);
+
 
   const toggleProfile = useCallback(() => {
     setShowProfile((prev) => !prev);
@@ -97,6 +99,13 @@ function StudentDashboard() {
   useEffect(() => {
     fetchData();
   }, [user]);
+
+  useEffect(() => {
+    if (favoritesUpdated) {
+      fetchData();
+      setFavoritesUpdated(false);
+    }
+  }, [favoritesUpdated]);
 
   // Handle returning from profile view - reload data when profile is closed
   useEffect(() => {
@@ -360,6 +369,8 @@ function StudentDashboard() {
                             item={topRecommendation}
                             onClick={handleCardClick}
                             isFavorited={favoriteIds.includes(topRecommendation.food_info?.id)}
+                            onFavoriteUpdate={() => setFavoritesUpdated(true)}
+
                           />
                         </div>
                       </div>
@@ -369,7 +380,7 @@ function StudentDashboard() {
                       <div className="text-red-600 mt-4 text-lg font-medium">{error}</div>
                     )}
 
-                    <h2 className="text-xl text-[#303030] mb-2">All Meals</h2>
+                    <h2 className="text-xl text-[#303030] mb-2">Other Meals</h2>
                     {filteredMenu.length === 0 && (
                       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                         <div className="flex">
@@ -409,6 +420,7 @@ function StudentDashboard() {
                             item={item}
                             onClick={handleCardClick}
                             isFavorited={favoriteIds.includes(item.food_info?.id)}
+                            onFavoriteUpdate={() => setFavoritesUpdated(true)}
                           />
                         ))}
                     </div>
