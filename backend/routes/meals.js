@@ -1,7 +1,7 @@
 import express from "express";
 import { supabase } from "../lib/supabaseClient.js";
-import multer from "multer"; 
-import crypto from "crypto"; 
+import multer from "multer";
+import crypto from "crypto";
 import { calculateHealthScore } from "../healthScore.js";
 
 const router = express.Router();
@@ -23,6 +23,7 @@ router.get("/week-menu", async (req, res) => {
       dining_hall,
       counter,
       date_available,
+      day,
       food_info (
         item_name,
         item_photo_link,
@@ -224,7 +225,7 @@ router.post("/food-info", upload.single("photo"), async (req, res) => {
  * This endpoint allows an admin to add a new menu item to the week's dining schedule
  */
 router.post("/week-menu", async (req, res) => {
-  const { dining_hall, counter, food_info_id, date_available } = req.body;
+  const { dining_hall, counter, food_info_id, date_available, day } = req.body;
 
   // Check if required fields are provided
   if (!dining_hall || !counter || !food_info_id) {
@@ -237,7 +238,8 @@ router.post("/week-menu", async (req, res) => {
       dining_hall,
       counter,
       food_info_id,
-      date_available, // optional, will default to today if not provided
+      date_available,
+      day// optional, will default to today if not provided
     },
   ]);
 
@@ -317,7 +319,7 @@ router.put("/food-info/:id", async (req, res) => {
  * Updates an existing menu item (e.g., change date, counter, or food)
  */
 router.put("/week-menu/:id", async (req, res) => {
-  const { dining_hall, counter, food_info_id, date_available } = req.body;
+  const { dining_hall, counter, food_info_id, date_available, day } = req.body;
   const { id } = req.params;
 
   const { data, error } = await supabase
@@ -327,6 +329,7 @@ router.put("/week-menu/:id", async (req, res) => {
       counter,
       food_info_id,
       date_available,
+      day
     })
     .eq("id", id);
 

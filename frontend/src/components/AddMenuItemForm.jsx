@@ -17,6 +17,8 @@ function AddMenuItemForm() {
   const [weekMenu, setWeekMenu] = useState([]);
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [menuMeta, setMenuMeta] = useState({ dining_hall: "", counter: "" });
+  const [selectedDay, setSelectedDay] = useState("");
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +58,8 @@ function AddMenuItemForm() {
         food_info_id: selectedFoodId,
         ...menuMeta,
         date_available: new Date().toISOString().split("T")[0],
+        day: selectedDay, // optional
+
       });
       alert("Menu item added successfully!");
       navigate("/admin/dashboard");
@@ -82,6 +86,23 @@ function AddMenuItemForm() {
         </button>
 
         <div className="space-y-6">
+          {/* Day Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value)}
+              className="w-full bg-[#edf7f8] text-[#3f3f3f] px-6 py-4 rounded-full appearance-none"
+            >
+              <option value="">Select Day</option>
+              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          </div>
+
           {/* Food Dropdown */}
           <div className="relative">
             <select

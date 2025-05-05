@@ -32,7 +32,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
 
   const handleEdit = (item) => {
     setEditRowId(item.id);
-    setEditData({ dining_hall: item.dining_hall, counter: item.counter });
+    setEditData({ dining_hall: item.dining_hall, counter: item.counter, day: item.day });
   };
 
   const handleSave = async (id) => {
@@ -50,13 +50,15 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
     <div className="w-full overflow-x-auto">
       <Card className="w-full border border-[#e7e7ed] rounded-xl overflow-hidden">
         <CardContent className="p-0">
-        <Table className="w-full table-auto">
+          <Table className="w-full table-auto">
             <TableHeader className="bg-white">
               <TableRow>
                 <TableHead className="w-12"></TableHead>
                 <TableHead>Item</TableHead>
                 <TableHead>Dining Hall</TableHead>
                 <TableHead>Counter</TableHead>
+                <TableHead>Day</TableHead>
+
                 {/* <TableHead>Status</TableHead> */}
                 <TableHead className="text-center">Actions</TableHead>
               </TableRow>
@@ -115,6 +117,28 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
                         In Stock
                       </Badge>
                     </TableCell> */}
+                    <TableCell>
+                      {editRowId === item.id ? (
+                        <select
+                          className="border p-1 rounded w-28"
+                          value={editData.day}
+                          onChange={(e) =>
+                            setEditData({ ...editData, day: e.target.value })
+                          }
+                        >
+                          {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
+                            (d) => (
+                              <option key={d} value={d}>
+                                {d}
+                              </option>
+                            )
+                          )}
+                        </select>
+                      ) : (
+                        item.day
+                      )}
+                    </TableCell>
+
 
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-4">
