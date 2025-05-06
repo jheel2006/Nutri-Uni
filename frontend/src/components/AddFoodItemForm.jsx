@@ -6,12 +6,15 @@ import { addFoodItem } from "../api/meals";
 import { Plus, ChevronLeft, Pencil } from "lucide-react";
 import Header from "./Header";
 import { MultiSelect } from "@/components/ui/multiselect";
+import { useToast } from "@/components/ToastContext";
+
 
 
 export default function AddItemFormPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef();
 
+  const { showToast } = useToast();
   const [newFood, setNewFood] = useState({
     item_name: "",
     item_photo_file: null,
@@ -41,15 +44,18 @@ export default function AddItemFormPage() {
 
     // Basic validation
     if (!item_name.trim()) {
-      return alert("⚠️ Please enter a valid item name.");
+      showToast("⚠️ Please enter a valid item name.");
+      return;
     }
 
     if (!item_photo_file) {
-      return alert("📷 Please upload a photo of the food item.");
+      showToast("📷 Please upload a photo of the food item.");
+      return;
     }
 
     if (allergens.length === 0 || allergens.every((a) => !a.trim())) {
-      return alert("⚠️ Please enter at least one allergen (or specify 'None').");
+      showToast("⚠️ Please enter at least one allergen (or specify 'None').");
+      return;
     }
 
     // Numeric field validation
@@ -64,10 +70,12 @@ export default function AddItemFormPage() {
     for (const { key, label } of fields) {
       const value = newFood[key];
       if (value === "" || value === null || isNaN(value)) {
-        return alert(`⚠️ Please enter a number for ${label}.`);
+        showToast(`⚠️ Please enter a number for ${label}.`);
+        return;
       }
       if (Number(value) < 0) {
-        return alert(`🚫 ${label} cannot be negative.`);
+         showToast(`🚫 ${label} cannot be negative.`);
+         return
       }
     }
 
@@ -86,11 +94,11 @@ export default function AddItemFormPage() {
       formData.append("photo", item_photo_file);
 
       await addFoodItem(formData);
-      alert("Food item added successfully!");
+      showToast("Food item added successfully!");
       navigate("/admin/dashboard");
     } catch (err) {
       console.error("Error uploading food item:", err);
-      alert("❌ Something went wrong while adding the food item. Please try again.");
+      showToast("❌ Something went wrong while adding the food item. Please try again.");
     }
   };
 

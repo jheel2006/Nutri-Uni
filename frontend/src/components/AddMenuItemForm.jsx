@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getFoodItems, addMenuItem, getWeekMenu } from "../api/meals";
 import Header from "@/components/Header";
 import { ChevronLeft, ChevronDown } from "lucide-react";
+import { useToast } from "@/components/ToastContext";
 
 const hallCounters = {
   D1: ["Mongolian", "Salad", "Japanese", "Grill"],
@@ -18,7 +19,7 @@ function AddMenuItemForm() {
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [menuMeta, setMenuMeta] = useState({ dining_hall: "", counter: "" });
   const [selectedDay, setSelectedDay] = useState("");
-
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +39,7 @@ function AddMenuItemForm() {
 
   const handleAddMenuItem = async () => {
     if (!selectedFoodId || !menuMeta.dining_hall || !menuMeta.counter) {
-      alert("All fields are required.");
+      showToast("All fields are required.");
       return;
     }
 
@@ -49,7 +50,7 @@ function AddMenuItemForm() {
     );
 
     if (isDuplicate) {
-      alert("This item is already on the menu for this dining hall and counter.");
+      showToast("This item is already on the menu for this dining hall and counter.");
       return;
     }
 
@@ -61,10 +62,10 @@ function AddMenuItemForm() {
         day: selectedDay, // optional
 
       });
-      alert("Menu item added successfully!");
+      showToast("Menu item added successfully!");
       navigate("/admin/dashboard");
     } catch (error) {
-      alert("Failed to add menu item.");
+      showToast("Failed to add menu item.");
     }
   };
 

@@ -178,6 +178,7 @@ router.get("/recommendations", async (req, res) => {
         id,
         dining_hall,
         counter,
+        day,
         date_available,
         food_info (
           id,
