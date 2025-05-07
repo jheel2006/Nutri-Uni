@@ -8,7 +8,7 @@ const DiningHallSelection = ({ diningHalls, onSelect }) => {
           <button
             key={hall}
             onClick={() => onSelect(hall)}
-            className="w-full p-6 rounded-xl shadow-sm bg-[#ebf6f7] hover:bg-[#bde6ea] transition-colors text-center"
+            className="w-full p-6 rounded-xl shadow-sm bg-[#ebf6f7] hover:bg-[#bde6ea] transition-colors text-center cursor-pointer"
           >
             <div className="text-xl font-medium">{hall}</div>
           </button>

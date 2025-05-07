@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, UserCircle } from "lucide-react";
 
-const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProfileClick, showSearch }) => {
+const Header = ({ activeTab, setActiveTab, setTabRefreshKey, showItemsTab = true, onSearch, onProfileClick, showSearch }) => {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProf
           {showItemsTab && (
             <button
               onClick={() => setActiveTab("items")}
-              className={`hover:underline ${
+              className={`cursor-pointer hover:underline ${
                 activeTab === "items"
                   ? "text-[#008b9e] underline font-semibold"
                   : "text-[#303030]"
@@ -52,8 +52,13 @@ const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProf
             </button>
           )}
           <button
-            onClick={() => setActiveTab("menu")}
-            className={`hover:underline ${
+            onClick={() => {
+              setActiveTab("menu");
+              if (typeof setTabRefreshKey === "function") {
+                setTabRefreshKey(prev => prev + 1);
+              }
+            }}
+            className={`cursor-pointer hover:underline ${
               activeTab === "menu"
                 ? "text-[#008b9e] underline font-semibold"
                 : "text-[#303030]"
@@ -62,7 +67,6 @@ const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProf
             Week's Menu
           </button>
         </nav>
-
         <UserCircle
           className="h-6 w-6 text-[#F9A826] cursor-pointer"
           onClick={onProfileClick}

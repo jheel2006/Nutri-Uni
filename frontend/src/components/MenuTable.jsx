@@ -22,10 +22,49 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
   const [editRowId, setEditRowId] = useState(null);
   const [editData, setEditData] = useState({ dining_hall: "", counter: "" });
   const { showToast } = useToast();
-  const handleDelete = async (id) => {
+
+  const groupedMenuItems = [];
+
+  menuItems.forEach((item) => {
+    const existing = groupedMenuItems.find(
+      (entry) =>
+        entry.food_info?.id === item.food_info?.id &&
+        entry.dining_hall === item.dining_hall &&
+        entry.counter === item.counter
+    );
+
+    if (existing) {
+      if (!existing.days.includes(item.day)) {
+        existing.days.push(item.day);
+      }
+      existing.ids.push(item.id);
+    } else {
+      groupedMenuItems.push({
+        ...item,
+        days: [item.day],
+        ids: [item.id],
+      });
+    }
+  });
+
+  const dayOrder = {
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+    Sunday: 7,
+  };
+
+  groupedMenuItems.forEach((item) => {
+    item.days.sort((a, b) => dayOrder[a] - dayOrder[b]);
+  });
+
+  const handleDelete = async (ids) => {
     try {
-      await deleteMenuItem(id);
-      showToast("Deleted!");
+      await Promise.all(ids.map((id) => deleteMenuItem(id)));
+      showToast("Deleted from all selected days!");
       refresh();
     } catch (err) {
       console.error(err);
@@ -35,7 +74,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
 
   const handleEdit = (item) => {
     setEditRowId(item.id);
-    setEditData({ dining_hall: item.dining_hall, counter: item.counter, day: item.day });
+    setEditData({ dining_hall: item.dining_hall, counter: item.counter });
   };
 
   const handleSave = async (id) => {
@@ -68,9 +107,9 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
             </TableHeader>
 
             <TableBody>
-              {!loading && menuItems.length > 0 ? (
-                menuItems.map((item) => (
-                  <TableRow key={item.id} className="h-[90px]">
+              {!loading && groupedMenuItems.length > 0 ? (
+                groupedMenuItems.map((item) => (
+                  <TableRow key={item.ids[0]} className="h-[90px]">
                     <TableCell className="p-3">
                       <Avatar className="h-12 w-12 rounded-full border">
                         <img
@@ -84,7 +123,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
                     <TableCell>{item.food_info?.item_name || "Unnamed"}</TableCell>
 
                     <TableCell>
-                      {editRowId === item.id ? (
+                      {editRowId === item.ids[0] ? (
                         <input
                           className="border p-1 rounded w-28"
                           value={editData.dining_hall}
@@ -98,7 +137,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
                     </TableCell>
 
                     <TableCell>
-                      {editRowId === item.id ? (
+                      {editRowId === item.ids[0] ? (
                         <input
                           className="border p-1 rounded w-28"
                           value={editData.counter}
@@ -117,35 +156,16 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
                       </Badge>
                     </TableCell> */}
                     <TableCell>
-                      {editRowId === item.id ? (
-                        <select
-                          className="border p-1 rounded w-28"
-                          value={editData.day}
-                          onChange={(e) =>
-                            setEditData({ ...editData, day: e.target.value })
-                          }
-                        >
-                          {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
-                            (d) => (
-                              <option key={d} value={d}>
-                                {d}
-                              </option>
-                            )
-                          )}
-                        </select>
-                      ) : (
-                        item.day
-                      )}
+                      {item.days?.join(", ")}
                     </TableCell>
-
 
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-4">
-                        {editRowId === item.id ? (
+                        {editRowId === item.ids[0] ? (
                           <>
                             <Button
                               size="sm"
-                              onClick={() => handleSave(item.id)}
+                              onClick={() => handleSave(item.ids[0])}
                               className="text-green-700 border border-green-700 font-semibold px-4 py-1"
                               variant="outline"
                             >
@@ -171,7 +191,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
 
                         <Button
                           variant="ghost"
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => handleDelete(item.ids)}
                           className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" /> Delete

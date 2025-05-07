@@ -69,6 +69,16 @@ import foodPlaceholder from '../assets/food_placeholder.png';
 import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+const DAY_ORDER = {
+  'Monday': 1,
+  'Tuesday': 2,
+  'Wednesday': 3,
+  'Thursday': 4,
+  'Friday': 5,
+  'Saturday': 6,
+  'Sunday': 7
+};
+
 const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp, onFavoriteUpdate }) => {
   const { user } = useUser();
   const [isFavorited, setIsFavorited] = useState(isFavoritedProp);
@@ -77,6 +87,14 @@ const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp, onFavoriteUpdat
   useEffect(() => {
     setIsFavorited(isFavoritedProp);
   }, [isFavoritedProp]);
+
+  const sortDays = (days) => {
+    return [...days].sort((a, b) => {
+      const dayA = a.trim();
+      const dayB = b.trim();
+      return (DAY_ORDER[dayA] || 999) - (DAY_ORDER[dayB] || 999);
+    });
+  };
 
   const toggleFavorite = async (e) => {
     e.preventDefault();
@@ -164,6 +182,15 @@ const MenuCard = ({ item, onClick, isFavorited: isFavoritedProp, onFavoriteUpdat
               </p>
             </div>
           )}
+          
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            <p className="text-sm text-gray-600 hover:text-gray-800">
+              <span className="font-semibold">Available: </span>
+              {item.days_available?.length > 0 
+                ? sortDays(item.days_available).join(", ")
+                : item.day || item.date_available || "Not specified"}
+            </p>
+          </div>
         </div>
       </div>
     </div>

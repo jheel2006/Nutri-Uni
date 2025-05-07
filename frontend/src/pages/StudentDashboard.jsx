@@ -1,7 +1,7 @@
-
 // StudentDashboard.jsx - 
 import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@clerk/clerk-react";
+import { useLocation } from "react-router-dom";
 import { getRecommendations, getStudentInfo } from "../api/students";
 import { getFavorites } from "../api/favorites";
 import Header from "@/components/Header";
@@ -26,6 +26,9 @@ const DAILY_VALUES = {
 
 function StudentDashboard() {
   const { user } = useUser();
+  const location = useLocation();
+  // Match AdminDashboard pattern: activeTab state at the top
+  const [activeTab, setActiveTab] = useState("menu");
   const [allMenu, setAllMenu] = useState([]);
   const [filteredMenu, setFilteredMenu] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState([]);
@@ -42,6 +45,7 @@ function StudentDashboard() {
   const [profileJustClosed, setProfileJustClosed] = useState(false);
   const [favoritesUpdated, setFavoritesUpdated] = useState(false);
   const [selectedDay, setSelectedDay] = useState("All Days");
+  const [tabRefreshKey, setTabRefreshKey] = useState(0);
   const recommendedIds = topRecommendations?.map(item => item.id) || [];
 
   const toggleProfile = useCallback(() => {
@@ -97,8 +101,11 @@ function StudentDashboard() {
   };
 
   useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
     fetchData();
-  }, [user]);
+  }, [user, location.state]);
 
   useEffect(() => {
     if (favoritesUpdated) {
@@ -140,17 +147,49 @@ function StudentDashboard() {
     setTopRecommendations(recommendations);
   }, [filteredMenu]);
 
+// Always clear selected dining hall/counter, hide profile, and fetch data on menu tab
+useEffect(() => {
+  if (activeTab === "menu") {
+    setShowProfile(false);
+    setSelectedDiningHall(null);
+    setSelectedCounter(null);
+    setSelectedDay("All Days");
+    fetchData();
+  }
+}, [activeTab, tabRefreshKey]);
+
   const handleSearch = (q) => {
     setQuery(q);
   };
 
   const applyFilters = (q, counter, diningHall) => {
     let filtered = [...allMenu];
-    filtered = filtered.map(item => ({
+    
+    // First, consolidate items with the same food_info.id
+    const uniqueItems = new Map();
+    filtered.forEach(item => {
+      if (!item.food_info?.id) return;
+      
+      if (!uniqueItems.has(item.food_info.id)) {
+        uniqueItems.set(item.food_info.id, {
+          ...item,
+          days_available: new Set()
+        });
+      }
+      
+      const existingItem = uniqueItems.get(item.food_info.id);
+      if (item.day || item.date_available) {
+        existingItem.days_available.add(item.day || item.date_available);
+      }
+    });
+    
+    filtered = Array.from(uniqueItems.values()).map(item => ({
       ...item,
+      days_available: Array.from(item.days_available).sort(),
       health_score: item.food_info?.health_score || 0,
       isFavorite: favoriteIds.includes(item.food_info?.id),
     }));
+
     if (diningHall) {
       filtered = filtered.filter(item => item.dining_hall?.toLowerCase() === diningHall.toLowerCase());
     }
@@ -159,9 +198,9 @@ function StudentDashboard() {
     }
     if (selectedDay && selectedDay !== "All Days") {
       filtered = filtered.filter((item) => {
-        const itemDay = (item.day || item.date_available || "").toString().trim().toLowerCase();
+        const itemDays = item.days_available || [];
         const selected = selectedDay.trim().toLowerCase();
-        return itemDay === selected;
+        return itemDays.some(day => day.toLowerCase() === selected);
       });
     }
     
@@ -254,7 +293,15 @@ function StudentDashboard() {
   if (loading) {
     return (
       <>
-        <Header showItemsTab={false} onSearch={handleSearch} onProfileClick={toggleProfile} />
+        <Header
+          showItemsTab={false}
+          onSearch={handleSearch}
+          onProfileClick={toggleProfile}
+          showSearch={!!selectedDiningHall}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          setTabRefreshKey={setTabRefreshKey}
+        />
         <div className="pt-20 px-4 md:px-6 lg:px-8 mt-20 flex justify-center items-center min-h-[50vh]">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#008b9e]"></div>
@@ -272,6 +319,9 @@ function StudentDashboard() {
         onSearch={handleSearch}
         onProfileClick={toggleProfile}
         showSearch={!!selectedDiningHall}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        setTabRefreshKey={setTabRefreshKey}
       />
 
       <div className="pt-20 px-4 md:px-6 lg:px-8 mt-20">
@@ -292,7 +342,7 @@ function StudentDashboard() {
                       <button
                         key={counter}
                         onClick={() => handleCounterFilter(counter)}
-                        className={`flex flex-col items-center justify-center w-20 h-28 rounded-full transition shadow-sm text-sm font-medium ${
+                        className={`cursor-pointer flex flex-col items-center justify-center w-20 h-28 rounded-full transition shadow-sm text-sm font-medium ${
                           selectedCounter === counter
                             ? "bg-[#AEE1E1] text-[#303030]"
                             : "bg-[#f3fafa] hover:bg-[#e1f0f0] text-[#303030]"
@@ -345,7 +395,7 @@ function StudentDashboard() {
                                 isFavorited={favoriteIds.includes(item.food_info?.id)}
                                 onFavoriteUpdate={() => setFavoritesUpdated(true)}
                               />
-                            ))}
+                          ))}
                         </div>
                       </div>
                     )}
@@ -369,6 +419,7 @@ function StudentDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredMenu
                         .filter(item => !recommendedIds.includes(item.id))
+                        .filter(item => selectedCounter ? item.counter === selectedCounter : true)
                         .map((item) => (
                           <MenuCard
                             key={item.id}
@@ -377,7 +428,7 @@ function StudentDashboard() {
                             isFavorited={favoriteIds.includes(item.food_info?.id)}
                             onFavoriteUpdate={() => setFavoritesUpdated(true)}
                           />
-                        ))}
+                      ))}
                     </div>
                   </>
                 )}

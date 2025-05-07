@@ -18,7 +18,7 @@ function AddMenuItemForm() {
   const [weekMenu, setWeekMenu] = useState([]);
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [menuMeta, setMenuMeta] = useState({ dining_hall: "", counter: "" });
-  const [selectedDay, setSelectedDay] = useState("");
+  const [selectedDays, setSelectedDays] = useState([]);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -38,30 +38,39 @@ function AddMenuItemForm() {
   }, []);
 
   const handleAddMenuItem = async () => {
-    if (!selectedFoodId || !menuMeta.dining_hall || !menuMeta.counter) {
+    if (!selectedFoodId || !menuMeta.dining_hall || !menuMeta.counter || selectedDays.length === 0) {
       showToast("All fields are required.");
       return;
     }
 
-    const isDuplicate = weekMenu.some(item =>
+    const newItems = selectedDays.map(day => ({
+      food_info_id: selectedFoodId,
+      ...menuMeta,
+      date_available: new Date().toISOString().split("T")[0],
+      day,
+    }));
+
+    const existing = weekMenu.filter(item =>
+      selectedDays.includes(item.day) &&
       item.food_info_id === selectedFoodId &&
       item.dining_hall === menuMeta.dining_hall &&
       item.counter === menuMeta.counter
     );
 
-    if (isDuplicate) {
-      showToast("This item is already on the menu for this dining hall and counter.");
+    const duplicateDays = existing.map(e => e.day);
+    if (duplicateDays.length > 0) {
+      showToast(`Already on menu for: ${duplicateDays.join(", ")}`);
       return;
     }
 
     try {
-      await addMenuItem({
-        food_info_id: selectedFoodId,
-        ...menuMeta,
-        date_available: new Date().toISOString().split("T")[0],
-        day: selectedDay, // optional
+      const itemsToAdd = newItems.filter(
+        ni => !existing.some(ei => ei.day === ni.day)
+      );
 
-      });
+      for (const menuItem of itemsToAdd) {
+        await addMenuItem(menuItem);
+      }
       showToast("Menu item added successfully!");
       navigate("/admin/dashboard");
     } catch (error) {
@@ -87,21 +96,27 @@ function AddMenuItemForm() {
         </button>
 
         <div className="space-y-6">
-          {/* Day Dropdown */}
-          <div className="relative">
-            <select
-              value={selectedDay}
-              onChange={(e) => setSelectedDay(e.target.value)}
-              className="w-full bg-[#edf7f8] text-[#3f3f3f] px-6 py-4 rounded-full appearance-none"
-            >
-              <option value="">Select Day</option>
+          {/* Day Checkboxes */}
+          <div className="space-y-2">
+            <label className="block font-semibold">Select Days</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                <option key={day} value={day}>
-                  {day}
-                </option>
+                <label key={day} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    value={day}
+                    checked={selectedDays.includes(day)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setSelectedDays(prev =>
+                        checked ? [...prev, day] : prev.filter(d => d !== day)
+                      );
+                    }}
+                  />
+                  <span>{day}</span>
+                </label>
               ))}
-            </select>
-            <ChevronDown className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            </div>
           </div>
 
           {/* Food Dropdown */}
