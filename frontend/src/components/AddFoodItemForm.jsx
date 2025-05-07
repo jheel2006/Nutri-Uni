@@ -53,10 +53,10 @@ export default function AddItemFormPage() {
       return;
     }
 
-    if (allergens.length === 0 || allergens.every((a) => !a.trim())) {
-      showToast("⚠️ Please enter at least one allergen (or specify 'None').");
-      return;
-    }
+    // if (allergens.length === 0 || allergens.every((a) => !a.trim())) {
+    //   showToast("⚠️ Please enter at least one allergen (or specify 'None').");
+    //   return;
+    // }
 
     // Numeric field validation
     const fields = [
@@ -95,7 +95,7 @@ export default function AddItemFormPage() {
 
       await addFoodItem(formData);
       showToast("Food item added successfully!");
-      navigate("/admin/dashboard");
+      navigate("/admin/dashboard", { state: { tab: "items" } });
     } catch (err) {
       console.error("Error uploading food item:", err);
       showToast("❌ Something went wrong while adding the food item. Please try again.");

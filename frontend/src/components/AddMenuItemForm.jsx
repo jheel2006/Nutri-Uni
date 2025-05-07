@@ -96,7 +96,7 @@ function AddMenuItemForm() {
         </button>
 
         <div className="space-y-6">
-          {/* Day Checkboxes */}
+          {/* Day Checkboxes
           <div className="space-y-2">
             <label className="block font-semibold">Select Days</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -117,7 +117,7 @@ function AddMenuItemForm() {
                 </label>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Food Dropdown */}
           <div className="relative">
@@ -175,6 +175,28 @@ function AddMenuItemForm() {
               <ChevronDown className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500" />
             </div>
           )}
+          {/* Select Days Section */}
+          <div className="bg-[#edf7f8] px-6 py-6 rounded-xl mt-2 space-y-3">
+            <label className="block text-lg text-[#303030]">Select Days</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
+                <label key={day} className="flex items-center space-x-2 text-[1.1rem]">
+                  <input
+                    type="checkbox"
+                    value={day}
+                    checked={selectedDays.includes(day)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setSelectedDays(prev =>
+                        checked ? [...prev, day] : prev.filter(d => d !== day)
+                      );
+                    }}
+                  />
+                  <span>{day}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           {/* Submit */}
           <div className="text-right pt-4">

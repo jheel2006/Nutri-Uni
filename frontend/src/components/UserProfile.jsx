@@ -84,14 +84,14 @@ export default function UserProfile({ onBack, isAdmin = false }) {
           className="cursor-pointer text-gray-600"
           onClick={onBack}
         />
-        <h1 className="text-2xl ml-3">Profile</h1>
+        <h1 className="text-3xl ml-3">Profile</h1>
       </div>
 
-      <div className="flex justify-center my-6 mb-16">
+      <div className="flex justify-center my-6 mb-20">
         <UserButton
           appearance={{
             elements: {
-              userButtonAvatarBox: "transform scale-[2.5]",
+              userButtonAvatarBox: "transform scale-[3.5]",
             },
           }}
         />
@@ -106,7 +106,7 @@ export default function UserProfile({ onBack, isAdmin = false }) {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Full Name</label>
+            <label className="text-lg font-medium text-gray-700">Full Name</label>
             <Input
               value={name}
               disabled
@@ -117,7 +117,7 @@ export default function UserProfile({ onBack, isAdmin = false }) {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">Email</label>
+            <label className="text-lg font-medium text-gray-700">Email</label>
             <Input
               value={email}
               disabled
@@ -129,7 +129,7 @@ export default function UserProfile({ onBack, isAdmin = false }) {
         {!isAdmin && (
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-lg font-medium text-gray-700">
                 Dietary Preference(s)
               </label>
               <MultiSelect
@@ -145,7 +145,7 @@ export default function UserProfile({ onBack, isAdmin = false }) {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Allergies</label>
+              <label className="text-lg font-medium text-gray-700">Allergies</label>
               <MultiSelect
                 options={allergyOptions.map((a) => ({
                   label: a,

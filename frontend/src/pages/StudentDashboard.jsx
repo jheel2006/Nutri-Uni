@@ -360,7 +360,7 @@ useEffect(() => {
                       onChange={(e) => setSelectedDay(e.target.value)}
                       className="px-4 py-2 border rounded-lg bg-white text-[#303030] shadow"
                     >
-                      <option value="All Days">All Days</option>
+                      <option value="All Days">All Days </option>
                       {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(day => (
                         <option key={day} value={day}>{day}</option>
                       ))}
