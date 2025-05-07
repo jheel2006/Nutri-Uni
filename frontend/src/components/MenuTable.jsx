@@ -4,6 +4,9 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import foodPlaceholder from "../assets/food_placeholder.png";
+import { useToast } from "@/components/ToastContext";
+
 import {
   Table,
   TableBody,
@@ -18,15 +21,15 @@ import { deleteMenuItem, updateMenuItem } from "../api/meals";
 const MenuTable = ({ menuItems = [], loading, refresh }) => {
   const [editRowId, setEditRowId] = useState(null);
   const [editData, setEditData] = useState({ dining_hall: "", counter: "" });
-
+  const { showToast } = useToast();
   const handleDelete = async (id) => {
     try {
       await deleteMenuItem(id);
-      alert("Deleted!");
+      showToast("Deleted!");
       refresh();
     } catch (err) {
       console.error(err);
-      alert("Error deleting item.");
+      showToast("Error deleting item.");
     }
   };
 
@@ -42,7 +45,7 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
       refresh();
     } catch (err) {
       console.error(err);
-      alert("Error updating item.");
+      showToast("Error updating item.");
     }
   };
 
@@ -70,15 +73,11 @@ const MenuTable = ({ menuItems = [], loading, refresh }) => {
                   <TableRow key={item.id} className="h-[90px]">
                     <TableCell className="p-3">
                       <Avatar className="h-12 w-12 rounded-full border">
-                        {item.food_info?.item_photo_link ? (
-                          <img
-                            src={item.food_info.item_photo_link}
-                            alt={item.food_info.item_name}
-                            className="object-cover w-full h-full rounded-full"
-                          />
-                        ) : (
-                          <div className="bg-white w-full h-full rounded-full" />
-                        )}
+                        <img
+                          src={item.food_info?.item_photo_link || foodPlaceholder}
+                          alt={item.food_info?.item_name || "Food item"}
+                          className="object-cover w-full h-full rounded-full"
+                        />
                       </Avatar>
                     </TableCell>
 

@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { UserButton } from "@clerk/clerk-react";
+import { useToast } from "@/components/ToastContext";
+
 
 const dietaryOptions = [
   { label: "Vegetarian", value: "is_veg" },
@@ -27,6 +29,7 @@ export default function UserProfile({ onBack, isAdmin = false }) {
   const [preferences, setPreferences] = useState([]);
   const [allergies, setAllergies] = useState([]);
   const [saving, setSaving] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,10 +68,10 @@ export default function UserProfile({ onBack, isAdmin = false }) {
 
     try {
       await updatePreferences(user.id, prefsToUpdate);
-      alert("Preferences saved successfully.");
+      showToast("Preferences saved successfully.");
     } catch (err) {
       console.error("Error saving preferences:", err);
-      alert("Failed to save. Please try again.");
+      showToast("Failed to save. Please try again.");
     }
 
     setSaving(false);

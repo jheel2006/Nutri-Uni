@@ -1,10 +1,6 @@
 // AdminDashboard.jsx
-
-
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-
 import {
   getWeekMenu,
   addFoodItem,
@@ -21,6 +17,7 @@ import FoodItemsTable from "@/components/FoodItemsTable";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UserProfile from "@/components/UserProfile";
+import { useToast } from "@/components/ToastContext";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -30,7 +27,7 @@ function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("menu");
   const [showProfile, setShowProfile] = useState(false);
   const location = useLocation();
-
+  const { showToast } = useToast();
   const [newFood, setNewFood] = useState({
     item_name: "",
     item_photo_link: "",
@@ -63,7 +60,7 @@ function AdminDashboard() {
   };
 
   const handleAddFoodItem = async () => {
-    if (!newFood.item_name) return alert("Item name is required.");
+    if (!newFood.item_name) return showToast("Item name is required.");
 
     try {
       const formData = new FormData();
@@ -83,7 +80,7 @@ function AdminDashboard() {
       }
 
       await addFoodItem(formData);
-      alert("Food item added!");
+      showToast("Food item added!");
       setNewFood({
         item_name: "",
         item_photo_file: null,
@@ -101,13 +98,13 @@ function AdminDashboard() {
       loadFoodItems();
     } catch (err) {
       console.error("Error uploading food item:", err);
-      alert("Error adding food item.");
+      showToast("Error adding food item.");
     }
   };
 
   const handleAddMenuItem = async () => {
     if (!selectedFoodId || !menuMeta.dining_hall || !menuMeta.counter)
-      return alert("All fields are required.");
+      return showToast("All fields are required.");
 
     try {
       await addMenuItem({
@@ -115,11 +112,11 @@ function AdminDashboard() {
         ...menuMeta,
         date_available: new Date().toISOString().split("T")[0],
       });
-      alert("Menu item added!");
+      showToast("Menu item added!");
       fetchMenu();
       setShowMenuForm(false);
     } catch (err) {
-      alert("Error adding menu item.");
+      showToast("Error adding menu item.");
     }
   };
 
@@ -187,5 +184,4 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
-
 

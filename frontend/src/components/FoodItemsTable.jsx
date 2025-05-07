@@ -1,3 +1,4 @@
+
 // File: FoodItemsTable.jsx - to display the food_info table
 
 import { useEffect, useState } from "react";
@@ -6,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import foodPlaceholder from '../assets/food_placeholder.png';
+import { useToast } from "@/components/ToastContext";
+import ConfirmDialog from "./ConfirmDialogue";
+
 import {
   Table,
   TableBody,
@@ -18,12 +22,14 @@ import { Pencil, Trash2 } from "lucide-react";
 import { getFoodItems, deleteFoodItem, updateFoodItem } from "../api/meals";
 import { MultiSelect } from "@/components/ui/multiselect";
 
-
 function FoodItemsTable({ loading, refresh }) {
   const [foodItems, setFoodItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editRowId, setEditRowId] = useState(null);
   const [editData, setEditData] = useState({});
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,16 +46,22 @@ function FoodItemsTable({ loading, refresh }) {
     fetchData();
   }, [refresh]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
+  const handleConfirmDelete = async () => {
     try {
-      await deleteFoodItem(id);
-      setFoodItems((prev) => prev.filter((item) => item.id !== id));
+      await deleteFoodItem(deleteId);
+      setFoodItems((prev) => prev.filter((item) => item.id !== deleteId));
+      setConfirmOpen(false);
+      setDeleteId(null);
       if (refresh) refresh();
     } catch (error) {
       console.error("Error deleting:", error);
-      alert("Could not delete item.");
+      showToast("Could not delete item.");
     }
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
+    setConfirmOpen(true);
   };
 
   const handleEdit = (item) => {
@@ -72,7 +84,7 @@ function FoodItemsTable({ loading, refresh }) {
       if (refresh) refresh();
     } catch (error) {
       console.error("Error saving:", error);
-      alert("Could not update item.");
+      showToast("Could not update item.");
     }
   };
 
@@ -150,25 +162,22 @@ function FoodItemsTable({ loading, refresh }) {
                     ) : (
                       "None"
                     )}
-
                   </TableCell>
                   <TableCell className="text-gray-600 text-sm leading-5">
                     {editRowId === item.id ? (
-                      <>
-                        <div className="flex flex-col gap-1">
-                          {["energy", "protein", "fats", "salt", "sugar"].map((key) => (
-                            <input
-                              key={key}
-                              placeholder={key}
-                              value={editData[key]}
-                              onChange={(e) =>
-                                setEditData({ ...editData, [key]: e.target.value })
-                              }
-                              className="border p-1 rounded w-full"
-                            />
-                          ))}
-                        </div>
-                      </>
+                      <div className="flex flex-col gap-1">
+                        {["energy", "protein", "fats", "salt", "sugar"].map((key) => (
+                          <input
+                            key={key}
+                            placeholder={key}
+                            value={editData[key]}
+                            onChange={(e) =>
+                              setEditData({ ...editData, [key]: e.target.value })
+                            }
+                            className="border p-1 rounded w-full"
+                          />
+                        ))}
+                      </div>
                     ) : (
                       <>
                         <div>Energy: {format(item.energy)} kcal</div>
@@ -210,7 +219,7 @@ function FoodItemsTable({ loading, refresh }) {
                           </Button>
                           <Button
                             variant="ghost"
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => handleDeleteClick(item.id)}
                             className="text-red-600"
                           >
                             <Trash2 className="h-4 w-4 mr-2" /> Delete
@@ -225,6 +234,17 @@ function FoodItemsTable({ loading, refresh }) {
           </Table>
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => {
+          setConfirmOpen(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Food Item"
+        description="Are you sure you want to delete this item? This action cannot be undone."
+      />
     </div>
   );
 }

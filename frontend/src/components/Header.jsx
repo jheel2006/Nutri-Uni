@@ -1,11 +1,13 @@
+// Header.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, UserCircle } from "lucide-react";
 
-const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProfileClick }) => {
+const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProfileClick, showSearch }) => {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
+
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
@@ -21,20 +23,21 @@ const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProf
         Nutri-Uni
       </div>
 
-      {/* Center: Search Bar */}
-      <div className="relative w-120 gap-60">
-        <Input
-          className="bg-white border border-[#e5dcdc] rounded-[10px] pl-10 py-2"
-          placeholder="Search meals by name, ingredient, or dietary category"
-          value={searchValue}
-          onChange={handleSearchChange}
-        />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-      </div>
+      {/* Center: Conditional Search Bar */}
+      {showSearch && (
+        <div className="relative w-120 gap-60">
+          <Input
+            className="bg-white border border-[#e5dcdc] rounded-[10px] pl-10 py-2"
+            placeholder="Search meals by name, ingredient, or dietary category"
+            value={searchValue}
+            onChange={handleSearchChange}
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        </div>
+      )}
 
       {/* Right: Nav Tabs + User */}
       <div className="flex items-center gap-8">
-        {/* Tabs */}
         <nav className="flex gap-6 font-medium text-sm">
           {showItemsTab && (
             <button
@@ -55,13 +58,11 @@ const Header = ({ activeTab, setActiveTab, showItemsTab = true, onSearch, onProf
                 ? "text-[#008b9e] underline font-semibold"
                 : "text-[#303030]"
             }`}
-            >
+          >
             Week's Menu
           </button>
         </nav>
 
-        {/* User Icon */}
-        {/* <UserCircle className="h-6 w-6 text-[#F9A826]" /> */}
         <UserCircle
           className="h-6 w-6 text-[#F9A826] cursor-pointer"
           onClick={onProfileClick}
