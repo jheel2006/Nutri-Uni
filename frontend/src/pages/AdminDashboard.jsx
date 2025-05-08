@@ -141,7 +141,7 @@ function AdminDashboard() {
           setActiveTab={setActiveTab}
           onProfileClick={() => setShowProfile(true)}
         />
-  
+
         {showProfile ? (
           <UserProfile onBack={() => setShowProfile(false)} isAdmin />
         ) : (
@@ -167,7 +167,7 @@ function AdminDashboard() {
                 )}
               </div>
             </div>
-  
+
             {activeTab === "menu" && (
               <MenuTable menuItems={menu} loading={loading} refresh={fetchMenu} />
             )}
@@ -179,7 +179,7 @@ function AdminDashboard() {
       </div>
     </div>
   );
-  
+
 
 }
 

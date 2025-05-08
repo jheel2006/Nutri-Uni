@@ -9,6 +9,22 @@ import MenuCard from "@/components/MenuCard";
 import DiningHallSelection from "@/components/DiningHallSelection";
 import { NutritionInfo } from "@/components/NutritionInfo";
 import UserProfile from "@/components/UserProfile";
+// Import Lucide icons
+import {
+  Utensils,
+  Salad,
+  Fish,
+  Flame,
+  BookOpen,
+  Sandwich,
+  Drumstick,
+  Pizza,
+  Leaf,
+  CircleDot,
+  EggFried,
+  Soup,
+  ChefHat
+} from "lucide-react";
 
 const hallCounters = {
   D1: ["Mongolian", "Salad", "Japanese", "Grill"],
@@ -63,14 +79,14 @@ function StudentDashboard() {
       ...item,
       food_info: item.food_info
         ? {
-            ...item.food_info,
-            energy_kj: calculateKJ(item.food_info.energy),
-            energy_percent: calculatePercentage(item.food_info.energy, "energy"),
-            fats_percent: calculatePercentage(item.food_info.fats, "fats"),
-            protein_percent: calculatePercentage(item.food_info.protein, "protein"),
-            sugar_percent: calculatePercentage(item.food_info.sugar, "sugar"),
-            salt_percent: calculatePercentage(item.food_info.salt, "salt"),
-          }
+          ...item.food_info,
+          energy_kj: calculateKJ(item.food_info.energy),
+          energy_percent: calculatePercentage(item.food_info.energy, "energy"),
+          fats_percent: calculatePercentage(item.food_info.fats, "fats"),
+          protein_percent: calculatePercentage(item.food_info.protein, "protein"),
+          sugar_percent: calculatePercentage(item.food_info.sugar, "sugar"),
+          salt_percent: calculatePercentage(item.food_info.salt, "salt"),
+        }
         : null,
     }));
   };
@@ -147,16 +163,16 @@ function StudentDashboard() {
     setTopRecommendations(recommendations);
   }, [filteredMenu]);
 
-// Always clear selected dining hall/counter, hide profile, and fetch data on menu tab
-useEffect(() => {
-  if (activeTab === "menu") {
-    setShowProfile(false);
-    setSelectedDiningHall(null);
-    setSelectedCounter(null);
-    setSelectedDay("All Days");
-    fetchData();
-  }
-}, [activeTab, tabRefreshKey]);
+  // Always clear selected dining hall/counter, hide profile, and fetch data on menu tab
+  useEffect(() => {
+    if (activeTab === "menu") {
+      setShowProfile(false);
+      setSelectedDiningHall(null);
+      setSelectedCounter(null);
+      setSelectedDay("All Days");
+      fetchData();
+    }
+  }, [activeTab, tabRefreshKey]);
 
   const handleSearch = (q) => {
     setQuery(q);
@@ -164,25 +180,25 @@ useEffect(() => {
 
   const applyFilters = (q, counter, diningHall) => {
     let filtered = [...allMenu];
-    
+
     // First, consolidate items with the same food_info.id
     const uniqueItems = new Map();
     filtered.forEach(item => {
       if (!item.food_info?.id) return;
-      
+
       if (!uniqueItems.has(item.food_info.id)) {
         uniqueItems.set(item.food_info.id, {
           ...item,
           days_available: new Set()
         });
       }
-      
+
       const existingItem = uniqueItems.get(item.food_info.id);
       if (item.day || item.date_available) {
         existingItem.days_available.add(item.day || item.date_available);
       }
     });
-    
+
     filtered = Array.from(uniqueItems.values()).map(item => ({
       ...item,
       days_available: Array.from(item.days_available).sort(),
@@ -203,7 +219,7 @@ useEffect(() => {
         return itemDays.some(day => day.toLowerCase() === selected);
       });
     }
-    
+
     if (q?.trim()) {
       const keyword = q.toLowerCase();
       filtered = filtered.filter(item => {
@@ -233,7 +249,7 @@ useEffect(() => {
         return !itemAllergens.some(a => allergens.includes(a.toLowerCase()));
       });
     }
-   
+
     setFilteredMenu(filtered);
   };
 
@@ -268,19 +284,50 @@ useEffect(() => {
     return hallCounters[selectedDiningHall] || [];
   };
 
-  const counterIcons = {
-    Mongolian: "🥢",
-    Salad: "🥗",
-    Japanese: "🍣",
-    Grill: "🔥",
-    Subjects: "📚",
-    Flavors: "🌶️",
-    Italian: "🍝",
-    Vegan: "🌱",
-    Chakra: "🔀",
-    "Los Amigos": "🌮️",
-    Asiatic: "🍜",
-    Pasta: "🍝",
+  // const counterIcons = {
+  //   Mongolian: "🥢",
+  //   Salad: "🥗",
+  //   Japanese: "🍣",
+  //   Grill: "🔥",
+  //   Subjects: "📚",
+  //   Flavors: "🌶️",
+  //   Italian: "🍝",
+  //   Vegan: "🌱",
+  //   Chakra: "🔀",
+  //   "Los Amigos": "🌮️",
+  //   Asiatic: "🍜",
+  //   Pasta: "🍝",
+  // };
+  // Replace emoji icons with Lucide React icons
+  const getCounterIcon = (counter) => {
+    switch (counter) {
+      case "Mongolian":
+        return <Utensils size={28} />;
+      case "Salad":
+        return <Salad size={28} />;
+      case "Japanese":
+        return <Fish size={28} />;
+      case "Grill":
+        return <Flame size={28} />;
+      case "Subjects":
+        return <Sandwich size={28} />;
+      case "Flavors":
+        return <Drumstick size={28} />;
+      case "Italian":
+        return <Pizza size={28} />;
+      case "Vegan":
+        return <Leaf size={28} />;
+      case "Chakra":
+        return <CircleDot size={28} />;
+      case "Los Amigos":
+        return <EggFried size={28} />;
+      case "Asiatic":
+        return <Soup size={28} />;
+      case "Pasta":
+        return <ChefHat size={28} />;
+      default:
+        return <Utensils size={28} />;
+    }
   };
 
   const handleProfileClose = () => {
@@ -342,13 +389,14 @@ useEffect(() => {
                       <button
                         key={counter}
                         onClick={() => handleCounterFilter(counter)}
-                        className={`cursor-pointer flex flex-col items-center justify-center w-20 h-28 rounded-full transition shadow-sm text-sm font-medium ${
-                          selectedCounter === counter
-                            ? "bg-[#AEE1E1] text-[#303030]"
-                            : "bg-[#f3fafa] hover:bg-[#e1f0f0] text-[#303030]"
-                        }`}
+                        className={`cursor-pointer flex flex-col items-center justify-center w-22 h-30 rounded-full transition shadow-sm text-sm font-medium ${selectedCounter === counter
+                          ? "bg-[#AEE1E1] text-[#303030]"
+                          : "bg-[#f3fafa] hover:bg-[#e1f0f0] text-[#303030]"
+                          }`}
                       >
-                        <div className="text-2xl mb-2">{counterIcons[counter] || "🍽️"}</div>
+                        <div className="flex items-center justify-center w-15 h-15 bg-white rounded-full mb-2 shadow-sm">
+                          {getCounterIcon(counter)}
+                        </div>
                         <span>{counter}</span>
                       </button>
                     ))}
@@ -395,7 +443,7 @@ useEffect(() => {
                                 isFavorited={favoriteIds.includes(item.food_info?.id)}
                                 onFavoriteUpdate={() => setFavoritesUpdated(true)}
                               />
-                          ))}
+                            ))}
                         </div>
                       </div>
                     )}
@@ -411,8 +459,8 @@ useEffect(() => {
                           {query.trim()
                             ? "No meals found. Try a different keyword."
                             : selectedCounter
-                            ? "No meals available at this counter today."
-                            : "No meals currently available in this dining hall."}
+                              ? "No meals available at this counter today."
+                              : "No meals currently available in this dining hall."}
                         </p>
                       </div>
                     )}
@@ -428,7 +476,7 @@ useEffect(() => {
                             isFavorited={favoriteIds.includes(item.food_info?.id)}
                             onFavoriteUpdate={() => setFavoritesUpdated(true)}
                           />
-                      ))}
+                        ))}
                     </div>
                   </>
                 )}

@@ -25,6 +25,7 @@ router.get("/week-menu", async (req, res) => {
       date_available,
       day,
       food_info (
+        id,
         item_name,
         item_photo_link,
         veg,
