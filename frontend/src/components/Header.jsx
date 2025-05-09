@@ -82,6 +82,7 @@ const Header = ({ activeTab, setActiveTab, setTabRefreshKey, showItemsTab = true
             </button>
           </nav>
           <UserCircle
+            data-testid="profile-icon" // Added for testing
             className="h-6 w-6 text-[#F9A826] cursor-pointer"
             onClick={onProfileClick}
           />
