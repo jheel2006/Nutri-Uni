@@ -1,7 +1,9 @@
-# Nutri-UnI – Dining Hall Nutrition Recommender
-## Software Engineering, Spring 2025
+# Nutri-UnI – Dining Hall Nutrition Web App
+## Software Engineering, Spring 2025, NYU Abu Dhabi
 
 Nutri-UnI is a full-stack web application that helps university students make informed dining choices. It personalizes meal recommendations based on dietary preferences, health scores, and user favorites.
+
+[View Nutri-UnI here](https://nutri-uni.vercel.app/)
 
 
 ## 🧰 Tech Stack
@@ -22,7 +24,7 @@ Nutri-UnI is a full-stack web application that helps university students make in
 
 ### Dev Tools
 - Vite (Frontend Dev Server)
-- Vitest (Testing)
+- Vitest, Postman & Lighthouse (Testing)
 - Nodemon (for backend dev)
 
 
@@ -123,7 +125,7 @@ Contributions are welcome! Please open a PR or submit issues if you'd like to he
 
 ## 
 
-Built by **Grace Chang, Jheel Thanki, Lujain Elmallah and Keya Shah**
+Built by **Grace Chang, Jheel Thanki, Keya Shah and Lujain Elmallah**
 
 A heartfelt thank you to Professor João Paulo Fernandes for his guidance, support, and for making this course an engaging learning experience. Your thoughtful feedback and practical insights have been invaluable throughout this project.
 
