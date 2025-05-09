@@ -43,7 +43,7 @@ Nutri-UnI is a full-stack web application that helps university students make in
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/nutri-uni.git
+git clone https://github.com/Lujain-Elmallah/Nutri-UnI.git
 cd Nutri-unI
 ```
 
