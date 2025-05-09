@@ -174,6 +174,34 @@ function AdminDashboard() {
             {activeTab === "items" && (
               <FoodItemsTable loading={loading} refresh={loadFoodItems} />
             )}
+
+          
+            {/* unit testing mocks */}
+          {process.env.NODE_ENV === "test" && (
+            <>
+              <button data-testid="test-add-food" onClick={handleAddFoodItem}>Trigger Add Food</button>
+              <button data-testid="test-set-food" onClick={() => setNewFood({
+                item_name: "Mock Dish",
+                veg: true,
+                vegan: false,
+                gluten_free: false,
+                allergens: ["nuts"],
+                energy: "100",
+                fats: "10",
+                protein: "20",
+                salt: "2",
+                sugar: "5",
+                item_photo_file: new File([""], "mock.png", { type: "image/png" }),
+              })}>Set NewFood</button>
+            </>
+          )}
+
+          {process.env.NODE_ENV === "test" && (
+            <button data-testid="test-add-menu" onClick={handleAddMenuItem}>Trigger Add Menu</button>
+          )}
+
+
+
           </>
         )}
       </div>
