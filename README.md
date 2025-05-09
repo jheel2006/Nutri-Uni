@@ -1,4 +1,4 @@
-# Nutri-UnI – Dining Hall Nutrition Web App
+# Nutri-UnI : A Dining Hall Nutrition Web App
 ## Software Engineering, Spring 2025, NYU Abu Dhabi
 
 Nutri-UnI is a full-stack web application that helps university students make informed dining choices. It personalizes meal recommendations based on dietary preferences, health scores, and user favorites.
